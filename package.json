@@ -1,13 +1,17 @@
 {
-  "name": "youtube",
+  "name": "youtube-backend",
   "version": "1.0.0",
-  "description": "youtube clone using MERN stack",
+  "description": "It is the backend of the Youtube clone app created using the MERN stack",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "javascript",
+    "express",
+    "mongodb",
+    "mongoose",
+    "nodejs",
     "MERN",
     "youtube-clone"
   ],
