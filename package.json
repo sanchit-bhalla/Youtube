@@ -2,9 +2,10 @@
   "name": "youtube-backend",
   "version": "1.0.0",
   "description": "It is the backend of the Youtube clone app created using the MERN stack",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js"
   },
   "keywords": [
     "javascript",
@@ -16,5 +17,8 @@
     "youtube-clone"
   ],
   "author": "Sanchit Bhalla",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  }
 }
