@@ -1,12 +1,25 @@
 // require("dotenv").config({ path: "./env" }); // CommonJs syntax
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 dotenv.config({
   path: "./env",
 });
+
 // WAY 1 to connect with DB - connection part not inside index.js
-connectDB();
+connectDB()
+  .then(() => {
+    app.on("error", (error) => {
+      console.log("ERR: ", error);
+      throw error;
+    });
+
+    app.listen(process.env.PORT || 8000, () => {
+      console.log(`Server is running at port: ${process.env.PORT || 8000}`);
+    });
+  })
+  .catch((err) => console.log(`MONGO db connection failed !!! `, err));
 
 // WAY 2 to connect with DB - connection part inside the index.js file
 /*
