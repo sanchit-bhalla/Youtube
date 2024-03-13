@@ -22,4 +22,10 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" })); // parses incomi
 app.use(express.static("public")); // express.static(root, [options]) - builtin middlewares for serving static files. The root argument specifies the root directory from which to serve static assets
 app.use(cookieParser()); // Parse Cookie header and populate req.cookies with an object keyed by the cookie names.
 
+// import routes
+import userRouter from "./routes/user.routes.js";
+
+// routes declaration
+app.use("/api/v1/users", userRouter);
+
 export { app };
