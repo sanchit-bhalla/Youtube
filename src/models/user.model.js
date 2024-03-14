@@ -63,7 +63,7 @@ userSchema.pre("save", async function (next) {
   // If user changes avatar and save, then we don't want to encrypt it again bcz password is not modified
   if (!this.isModified("password")) return next();
 
-  this.password = bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 

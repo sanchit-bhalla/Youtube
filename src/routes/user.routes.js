@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { registerUser } from "../controllers/user.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 /*
     - A router object is an isolated instance of middleware and routes. 
@@ -10,6 +11,18 @@ import { registerUser } from "../controllers/user.controller.js";
 const router = Router();
 
 // router.route(path) -  Returns an instance of a single route which you can then use to handle HTTP verbs with optional middleware. Use router.route() to avoid duplicate route naming and thus typing errors.
-router.route("/register").post(registerUser);
+router.route("/register").post(
+  upload.fields([
+    {
+      name: "avatar",
+      maxCount: 1,
+    },
+    {
+      name: "coverImage",
+      maxCount: 1,
+    },
+  ]),
+  registerUser
+);
 
 export default router;
