@@ -15,7 +15,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // check for user creation
   // return res
   const { username, email, fullName, password } = req.body;
-  console.table([username, email, fullName, password]);
+  // console.log({ username, email, fullName, password });
 
   // Instead of checking each field individually, we can do this.
   // some - determines whether the specified callback function returns true for any element of an array.
@@ -26,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // if user already exists with current username or email
-  const existingUser = User.find({
+  const existingUser = await User.findOne({
     $or: [{ username }, { email }],
   });
 
@@ -34,9 +34,24 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exists.");
   }
 
-  console.log(req.files);
+  /*
+    req.files?.avatar is of form
+    [
+      {
+        fieldname: 'avatar',
+        originalname: 'blazzer.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        destination: './public/temp',
+        filename: 'blazzer.jpg-1710501686466-209382079',
+        path: 'public\\temp\\blazzer.jpg-1710501686466-209382079',
+        size: 7322
+      }
+    ],
+  */
+
   const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
   if (!avatarLocalPath) throw new ApiError(400, "Avatar image is required");
 
