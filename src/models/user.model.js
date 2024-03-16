@@ -67,6 +67,7 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+// custom document instance methods
 userSchema.methods.isPasswordCorrect = async function (password) {
   // bcrypt.compare(plain text, encrypted password)
   return await bcrypt.compare(password, this.password);
