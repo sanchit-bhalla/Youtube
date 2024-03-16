@@ -6,7 +6,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-
+import { refreshAccessToken } from "../controllers/user.controller.js";
 /*
     - A router object is an isolated instance of middleware and routes. 
     - Think of it as a “mini-application,” . We can add middleware and HTTP method routes (such as get, put, post, and so on) to it just like an application
@@ -35,5 +35,7 @@ router.route("/login").post(loginUser);
 // secured routes
 // verifyJwt --> If user is logged in i.e accessToken is present, it will add user to the req.user
 router.route("/logout").post(verifyJWT, logoutUser);
+
+router.route("/refresh-token").post(refreshAccessToken);
 
 export default router;
