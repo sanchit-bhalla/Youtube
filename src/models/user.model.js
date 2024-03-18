@@ -54,8 +54,28 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+// add avatarPublicId and coverImagePublicId as virtuals
+// We can store public ids in db also along with url (avatar, coverImage)
+// In Mongoose, a virtual is a property that is not stored in MongoDB.
+userSchema.virtual("avatarPublicId").get(function () {
+  // avatar --> http://res.cloudinary.com/dshvoo7qz/image/upload/v1710588859/k501mjof2zzzxac6nt3f.jpg
+  // It is of form : http://res.cloudinary.com/cloud_name/image/upload/`v${version}`/public_id.jpg
+  return this.avatar
+    ?.split(/\bupload\b/)?.[1]
+    ?.replace(/^\/v[A-Za-z0-9]+\//, "")
+    ?.split(".")?.[0]; // k501mjof2zzzxac6nt3f
+});
+
+userSchema.virtual("coverImagePublicId").get(function () {
+  // coverImage --> http://res.cloudinary.com/dshvoo7qz/image/upload/v1710588860/jzglj9u6ejf4kguvppko.jpg
+  return this.coverImage
+    ?.split(/\bupload\b/)?.[1]
+    ?.replace(/^\/v[A-Za-z0-9]+\//, "")
+    ?.split(".")?.[0]; // jzglj9u6ejf4kguvppko
+});
 
 // encrypt password before saving
 userSchema.pre("save", async function (next) {

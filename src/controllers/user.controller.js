@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -238,13 +239,20 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    throw new ApiError(422, "Invalid inputs passed", errors?.array());
+
+  const { oldPassword, newPassword, confirmNewPassword } = req.body;
+
+  if (newPassword !== confirmNewPassword)
+    throw new ApiError(400, "New password and Confirm password didn't match");
 
   const user = await User.findById(req.user?._id);
   if (!user) throw new ApiError(401, "not authorized");
 
-  const isPasswordCorrect = await user.isPasswordCorrect(password);
-  if (isPasswordCorrect) throw new ApiError(400, "Invalid Old password");
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+  if (!isPasswordCorrect) throw new ApiError(400, "Invalid Old password");
 
   user.password = newPassword;
   await user.save({ validateBeforeSave: false });
@@ -262,6 +270,10 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty())
+    throw new ApiError(400, "Invalid fields", errors?.array());
+
   const { fullName, email } = req.body;
 
   if (!fullName || !email) throw new ApiError(400, "All fields are required");
@@ -288,6 +300,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
   if (!avatarLocalPath) throw new ApiError(400, "Avatar file is misssing");
 
+  // TODO: Delete previous uploaded avatar from cloudinary
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar.url)
@@ -310,6 +323,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   if (!coverImageLocalPath)
     throw new ApiError(400, "Cover Image file is misssing");
 
+  // TODO: Delete previous uploaded coverImage from cloudinary
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!coverImage.url)
