@@ -2,7 +2,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  removeFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 
@@ -300,17 +303,23 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
   if (!avatarLocalPath) throw new ApiError(400, "Avatar file is misssing");
 
-  // TODO: Delete previous uploaded avatar from cloudinary
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar.url)
     throw new ApiError(400, "Error occured while uploading avatar");
+
+  const avatarPublicId = req.user?.avatarPublicId;
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user?._id,
     { $set: { avatar: avatar.url } },
     { new: true } // gives updated object
   ).select("-password -refreshToken");
+
+  // Delete previous uploaded avatar from cloudinary
+  // It it returns false, it means previous image has not been removed from cloudinary. We need to remove it manually.
+  // We could also use transactions and show message to user `Update operation failed. Please try agin later!`
+  await removeFromCloudinary(avatarPublicId);
 
   return res
     .status(200)
@@ -323,17 +332,23 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   if (!coverImageLocalPath)
     throw new ApiError(400, "Cover Image file is misssing");
 
-  // TODO: Delete previous uploaded coverImage from cloudinary
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!coverImage.url)
     throw new ApiError(400, "Error occured while uploading coverImage");
+
+  const coverImagePublicId = req.user?.coverImagePublicId;
 
   const updatedUser = await User.findByIdAndUpdate(
     req.user?._id,
     { $set: { coverImage: coverImage.url } },
     { new: true } // gives updated object
   ).select("-password -refreshToken");
+
+  // Delete previous uploaded coverImage from cloudinary
+  // It it returns false, it means previous image has not been removed from cloudinary. We need to remove it manually.
+  // We could also use transactions and show message to user `Update operation failed. Please try agin later!`
+  await removeFromCloudinary(coverImagePublicId);
 
   return res
     .status(200)

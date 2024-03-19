@@ -73,7 +73,7 @@ router
   .post(verifyJWT, upload.single("avatar"), updateUserAvatar);
 
 router
-  .route("/update-avatar")
+  .route("/update-cover-image")
   .post(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 
 export default router;
