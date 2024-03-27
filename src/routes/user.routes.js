@@ -9,10 +9,11 @@ import {
   updateAccountDetails,
   updateUserAvatar,
   updateUserCoverImage,
+  getUserChannelProfile,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 /*
     - A router object is an isolated instance of middleware and routes. 
@@ -75,5 +76,9 @@ router
 router
   .route("/update-cover-image")
   .post(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
+
+router
+  .route("/:username")
+  .get(verifyJWT, param("username").trim().notEmpty(), getUserChannelProfile);
 
 export default router;

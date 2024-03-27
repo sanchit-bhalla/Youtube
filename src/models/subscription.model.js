@@ -6,6 +6,7 @@ const subscriptionSchema = new Schema(
       // one who is subscribing
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "Subscriber is required"],
     },
     channel: {
       // to whom 'subscriber' is subscribing
