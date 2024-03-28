@@ -7,6 +7,7 @@ import {
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
 import { validationResult } from "express-validator";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -430,7 +431,9 @@ const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
       // req.user._id is a string created by mongoose. But in aggregation pipelines we need mongodb Id
-      $match: new mongoose.Types.ObjectId(req.use._id),
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user._id),
+      },
     },
     {
       $lookup: {

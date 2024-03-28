@@ -10,6 +10,7 @@ import {
   updateUserAvatar,
   updateUserCoverImage,
   getUserChannelProfile,
+  getWatchHistory,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -60,7 +61,7 @@ router
 
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 
-router.route("/update-details").post(
+router.route("/update-account").patch(
   verifyJWT,
   [
     body("fullName").notEmpty().escape(), //  escape --> transforms special HTML characters with others that can be represented as text. Basically we are Sanitizing Input
@@ -68,17 +69,17 @@ router.route("/update-details").post(
   ],
   updateAccountDetails
 );
+router
+  .route("/avatar")
+  .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
+router
+  .route("/cover-image")
+  .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 
 router
-  .route("/update-avatar")
-  .post(verifyJWT, upload.single("avatar"), updateUserAvatar);
-
-router
-  .route("/update-cover-image")
-  .post(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
-
-router
-  .route("/:username")
+  .route("/c/:username")
   .get(verifyJWT, param("username").trim().notEmpty(), getUserChannelProfile);
+
+router.route("/history").get(verifyJWT, getWatchHistory);
 
 export default router;
